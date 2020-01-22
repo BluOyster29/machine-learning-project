@@ -9,6 +9,13 @@ def gen_data_frames(df, genre2int, max_num):
 
     nr_training_examples = {'Rock'   : 0,
                         'Pop'        : 0,
+                        'Metal'      : 0,
+                        'Country'    : 0,
+                        'Hip-Hop'    : 0,
+                        }
+
+    '''nr_training_examples = {'Rock'   : 0,
+                        'Pop'        : 0,
                         'R&B'        : 0,
                         'Metal'      : 0,
                         'Country'    : 0,
@@ -17,7 +24,7 @@ def gen_data_frames(df, genre2int, max_num):
                         'Indie'      : 0,
                         'Jazz'       : 0,
                         'Electronic' : 0
-                        }
+                        }'''
 
     index = []
     lyrics = []
@@ -110,13 +117,15 @@ def main():
     print('Loading lyric csv')
     train_lyrics = pd.read_csv('data/raw/train.csv')
     test_lyrics = pd.read_csv('data/raw/test.csv')
-    genres = ['Rock', 'Pop', 'R&B', 'Metal', 'Country', 'Folk',
-      'Hip-Hop', 'Indie', 'Jazz', 'Electronic']
+    genres = ['Rock', 'Pop', 'Metal', 'Country',
+      'Hip-Hop']
+    '''genres = ['Rock', 'Pop', 'R&B', 'Metal', 'Country', 'Folk',
+      'Hip-Hop', 'Indie', 'Jazz', 'Electronic']'''
     int2genre = dict(enumerate(genres))
     genre2int = {genre : num for num, genre in int2genre.items()}
     print('Trimming datast')
-    training_df, x_train, y_train = gen_data_frames(train_lyrics, genre2int, 1000)
-    testing_df, x_test, y_test = gen_data_frames(test_lyrics, genre2int, 1000)
+    training_df, x_train, y_train = gen_data_frames(train_lyrics, genre2int, 5000)
+    testing_df, x_test, y_test = gen_data_frames(test_lyrics, genre2int, 5000)
     stops = get_stopwords(stopwords.words('english'), punctuation)
     print('Tokenizing')
     train_tokenized = tokenize(x_train, stops)
