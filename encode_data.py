@@ -1,7 +1,7 @@
 from ProjDataset import ProjDataset
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-import torch, pickle, random
+import torch, pickle, random, os
 from torch.nn.utils.rnn import pad_sequence
 from torch.optim import Adam
 import torch.optim as optim
@@ -75,10 +75,10 @@ def train(model, train_dl, vocab_size,
             optimizer.step()
 
             avg_loss = sum(epoch_loss) / len(epoch_loss)
-            print("Average loss at epoch %d: %.7f" % (epoch_nr, avg_loss))
-        return model
+        print("Average loss at epoch %d: %.7f" % (epoch_nr, avg_loss))
+    return model
 
-def save_model(model, path, model_name):
+def save_model(model, model_name):
     directory = 'trained_models/'
     if os.path.exists(directory) == False:
         os.mkdir(directory)
