@@ -84,14 +84,15 @@ def test_model(trained_model, test_dataset, device):
     count = 0
     for x, y in tqdm(test_dataset):
         count += 1
-        hidden_layer = trained_model.init_hidden(200).to(device)
-        prediction = trained_model(x.unsqueeze(0).to(device), hidden_layer)
+        hidden_layer = trained_model.init_hidden(1).to(device)
+        prediction = trained_model(x.unsqueeze(0).to(device), hidden_layer, device)
         _, indeces = torch.max(prediction[0].data, dim=1)
 
-    if indeces[0].item() == y:
-        correct += 1
+        if indeces[0].item() == y:
+            correct += 1
 
-    accuracy = (correct / count * 100)
+    accuracy = (correct / count) * 100
+
     return accuracy
 
 def save_model(model, model_name):
@@ -135,7 +136,7 @@ def main():
     hidden_size = 200'''
 
     batch_size = 200
-    nr_of_epochs = 10
+    nr_of_epochs = 40
     vocab_size = len(wor2int)
     hidden_size = 200
 
@@ -153,7 +154,7 @@ def main():
                           hidden_size)
 
     #save_model(trained_model, model_name)
-    test_model(trained_model, test_dataset, device)
+    accuracy = test_model(trained_model, test_dataset, device)
     print(accuracy)
 if __name__== '__main__':
     main()
