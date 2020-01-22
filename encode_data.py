@@ -78,7 +78,7 @@ def train(model, train_dl, vocab_size, device, nr_of_epochs, batch_size, hidden_
         print("Average loss at epoch %d: %.7f" % (epoch_nr, avg_loss))
     return model
 
-def test_model(trained_model, test_dataset):
+def test_model(trained_model, test_dataset, device):
 
     correct = 0
     count = 0
@@ -153,7 +153,7 @@ def main():
                           hidden_size)
 
     #save_model(trained_model, model_name)
-    test_model(trained_model, test_dataset)
+    test_model(trained_model, test_dataset, device)
     print(accuracy)
 if __name__== '__main__':
     main()
