@@ -44,9 +44,8 @@ def output_dl(data, filename):
     with open('dataloaders/' + filename, 'wb') as file:
         pickle.dump(data, file)
 
-def train(model, train_dl, vocab_size,
-          device, nr_of_epochs, batch_size,
-          hidden_size):
+def train(model, train_dl, vocab_size, device, nr_of_epochs, batch_size, hidden_size):
+
     print('Training')
     criterion = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=0.001)
@@ -55,6 +54,7 @@ def train(model, train_dl, vocab_size,
     epoch_nr = 0
     EPOCH = list(range(nr_of_epochs))
     tenp = round(len(train_dl,) / 10)
+
     for epoch in tqdm(EPOCH):
         epoch_nr += 1
         epoch_loss = []
@@ -78,6 +78,22 @@ def train(model, train_dl, vocab_size,
         print("Average loss at epoch %d: %.7f" % (epoch_nr, avg_loss))
     return model
 
+def test_model(trained_model, test_dataset):
+
+    correct = 0
+    count = 0
+    for x, y in tqdm(test_dataset):
+        count += 1
+        hidden_layer = trained_model.init_hidden(200).to(device)
+        prediction = trained_model(x.unsqueeze(0).to(device), hidden_layer)
+        _, indeces = torch.max(prediction[0].data, dim=1)
+
+    if indeces[0].item() == y:
+        correct += 1
+
+    accuracy = (correct / count * 100)
+    return accuracy
+
 def save_model(model, model_name):
     directory = 'trained_models/'
     if os.path.exists(directory) == False:
@@ -90,7 +106,6 @@ def main():
                                  'data/pre_processed/y_train_lemm.txt')
     x_test, y_test = load_data('data/pre_processed/x_test_lemm.txt',
                                  'data/pre_processed/y_test_lemm.txt')
-
 
     train_vocab = get_vocab(x_train)
     int2wor = dict(enumerate(set(train_vocab)))
@@ -137,7 +152,8 @@ def main():
                           nr_of_epochs, batch_size,
                           hidden_size)
 
-    save_model(trained_model, model_name)
-
+    #save_model(trained_model, model_name)
+    test_model(trained_model, test_dataset)
+    print(accuracy)
 if __name__== '__main__':
     main()
