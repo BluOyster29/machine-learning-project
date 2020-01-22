@@ -143,7 +143,7 @@ def main():
     model_name = input('Name the model: ')
     model = RNN_GRU(vocab_size=vocab_size, seq_len=150,
                    input_size=150, hidden_size=hidden_size,
-                   num_layers=2, output_size=10,
+                   num_layers=2, output_size=5,
                    device=torch.device(device), dropout=0.01)
 
     print(model)
