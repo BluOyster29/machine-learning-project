@@ -24,10 +24,10 @@ def get_args():
                         help="Number of epochs", default="10")
     parser.add_argument("-D", "--glove_dimension", dest='dim', type=int,
                         help="Choose dimension for pretrained embeddings", default=50)
-    parser.add_argument("-G", "--use_gpu", dest='dim', type=str,
+    parser.add_argument("-G", "--use_gpu", dest='gpu', type=str,
                         help="Use GPU for training (y/n)", default='y')
     parser.add_argument("-M", "--model_name", dest='model_name', type=str,
-                        help="name of model to save", defal='unnamed_model')
+                        help="name of model to save", default='unnamed_model')
     args = parser.parse_args()
 
     return args
@@ -175,13 +175,13 @@ if __name__ == '__main__':
 
     model = ConcatPoolingGRUAdaptive(vocab_size, embedding_dim,
                                     n_hidden, n_out, x_field.vocab.vectors,
-                                    pretrained).to(device)
+                                    pretrained, device).to(device)
 
     print(model)
     print('Training')
     trained_model = train(model, EPOCHS, device, train_batch_it)
 
-    output_model(trained_model, args.model_name)
+    save_model(trained_model, args.model_name)
 
     '''print('Evaluating Model')
     evaluate(trained_model, test_batch_it)'''
