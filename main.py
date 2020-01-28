@@ -2,7 +2,7 @@ import pandas as pd
 from torchtext.data import Iterator, BucketIterator, TabularDataset, Field
 from torch import nn
 from ProjDataset import ProjDataset
-from tqdm import tqdm_notebook
+from tqdm import tqdm
 from torch.utils.data import DataLoader
 import torch, pickle, random, os, spacy, argparse
 from torch.nn.utils.rnn import pad_sequence
@@ -95,11 +95,11 @@ def train(model, nr_epochs, device, training_dl):
     criterion = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=0.001)
 
-    for epoch in tqdm_notebook(EPOCH):
+    for epoch in tqdm(EPOCH):
         epoch_nr += 1
         epoch_loss = []
         count = 0
-        for i in tqdm_notebook(training_dl):
+        for i in tqdm(training_dl):
             x = i[0][0]
             y = i[1].to(device)
             lengths = i[0][1]
@@ -114,17 +114,18 @@ def train(model, nr_epochs, device, training_dl):
             except RuntimeError:
                 continue
         print("Average loss at epoch %d: %.7f" % (epoch_nr, avg_loss))
-    return trained_model
+    return model
+
 def evaluate(trained_model, testdl):
     correct = 0
     count = 0
-    for i in tqdm_notebook(test_dl):
+    for i in tqdm(testdl):
 
         x = i[0][0]
         y = i[1]
         lengths = i[0][1]
         try:
-            predictions = pre_model(x, lengths)
+            predictions = trained_model(x, lengths)
             for prediction in zip(predictions,y):
                 count+=1
                 output, index = torch.max(prediction[0], 0)
@@ -152,7 +153,7 @@ if __name__ == '__main__':
     embedding_dim = dim
     n_out = 5
     EPOCHS = 10
-    device = 'cpu'
+    device = 'cuda:01'
     n_hidden = 128
     train_batch_it = BatchGenerator(traindl, 'lyrics', 'genre')
     test_batch_it = BatchGenerator(testdl, 'lyrics', 'genre')
@@ -160,7 +161,7 @@ if __name__ == '__main__':
 
     model = ConcatPoolingGRUAdaptive(vocab_size, embedding_dim,
                                     n_hidden, n_out, x_field.vocab.vectors,
-                                    pretrained).to(device)
+                                    pretrained, device).to(device)
 
     print(model)
     print('Training')
