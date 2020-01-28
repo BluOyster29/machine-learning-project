@@ -4,7 +4,7 @@ from torch import nn
 from ProjDataset import ProjDataset
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-import torch, pickle, random, os, spacy, argparse
+import torch, pickle, random, os, spacy, argparse, dill
 from torch.nn.utils.rnn import pad_sequence
 from torch.optim import Adam
 import torch.optim as optim
@@ -60,16 +60,21 @@ def get_dataset(TEXT, LABEL):
     return train, test
 
 def get_vocab(trn, TEXT, pretrained_bool, dimensions):
-    if pretrained==True:
-
-        if dim == 50:
-            TEXT.build_vocab(trn, max_size=100000, vectors="glove.6B/glove.6B.50d.txt")
-        elif dim == 100:
-            TEXT.build_vocab(trn, max_size=100000, vectors="glove.6B/glove.6B.100.txt")
-        elif dim == 200:
-            TEXT.build_vocab(trn, max_size=100000, vectors="glove.6B/glove.6B.200.txt")
-        elif dim == 300:
-            TEXT.build_vocab(trn, max_size=100000, vectors="glove.6B/glove.6B.300.txt")
+    print('Pretrained: {}'.format(pretrained), 'Dimensions: {}'.format(dimensions))
+    if pretrained=='y':
+        print('Pretrained: True')
+        if dimensions == 50:
+            print('Loading glove.6B.50d Vectors')
+            TEXT.build_vocab(trn, max_size=100000, vectors="glove.6B.50d")
+        elif dimensions == 100:
+            print('Loading glove.6B.100d Vectors')
+            TEXT.build_vocab(trn, max_size=100000, vectors="glove.6B.100d")
+        elif dimensions == 200:
+            print('Loading glove.6B.200d Vectors')
+            TEXT.build_vocab(trn, max_size=100000, vectors="glove.6B.200d")
+        elif dimensions == 300:
+            print('Loading glove.6B.300d Vectors')
+            TEXT.build_vocab(trn, max_size=100000, vectors="glove.6B.300d")
 
         return TEXT
 
@@ -87,6 +92,18 @@ def get_iterators(train_dataset, test_dataset, batch_size):
                      repeat=False)
 
         return traindl, testdl
+
+def save_dataloaders(train_loader, test_loader, model_name):
+    directory = 'dataloaders/'
+    if os.path.exists(directory) == False:
+        os.mkdir(directory)
+
+    train = '{}_training_loader.pkl'.format(model_name)
+    test = '{}_test_dataset.pkl'.format(model_name)
+
+    for i in zip([train_loader, test_loader], [train,test]):
+        with open(directory+i[1], 'wb') as file:
+            dill.dump(i[0],file)
 
 def train(model, nr_epochs, device, training_dl):
 
@@ -147,7 +164,7 @@ def evaluate(trained_model, testdl):
     accuracy = (correct / count) * 100
 
     print('Model Accuracy: {}'.format(accuracy))
-
+    
 if __name__ == '__main__':
 
     args = get_args()
@@ -171,6 +188,7 @@ if __name__ == '__main__':
     n_hidden = 128
     train_batch_it = BatchGenerator(traindl, 'lyrics', 'genre')
     test_batch_it = BatchGenerator(testdl, 'lyrics', 'genre')
+    #save_dataloaders(traindl, testdl, args.model_name)
     print('Generating Model')
 
     model = ConcatPoolingGRUAdaptive(vocab_size, embedding_dim,
@@ -183,5 +201,5 @@ if __name__ == '__main__':
 
     save_model(trained_model, args.model_name)
 
-    '''print('Evaluating Model')
-    evaluate(trained_model, test_batch_it)'''
+    print('Evaluating Model')
+    evaluate(trained_model, test_batch_it)
