@@ -2,6 +2,9 @@
 
 The following is a machine learning project using methods learned in the Machine Learning course led by Assad Sayeed at the University of Gothenburg
 
+## Introduction
+The project is an experiment with sentiment analysis. The goal is to accurately predict the genre of a song based on the contents of the lyrics using pretrained and learned vectors. The model is trained on a dataset containing song lyrics and their genre annotation. I managed to gain accuracy of around 46/47 percent, pretrained vectors didn't make much difference. I believe preprocessing may be to blame as the dataset contains examples from multiply languages. 
+
 ## How to run
 
 The program can be used by running the script `main.py`. As I have not found a way to export Torchtext generators unfortunately we have to pre_process, train and test in the same script. It doesn't take that long however. The command line arguments ar as follows:
