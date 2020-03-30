@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from torch import nn
 import torch
 
-class ConcatPoolingGRUAdaptive(nn.Module):
+class Rnn_Gru(nn.Module):
     def __init__(self, vocab_size, embedding_dim, n_hidden, n_out,
                     pretrained_vec, pretrained, device):
         super().__init__()
